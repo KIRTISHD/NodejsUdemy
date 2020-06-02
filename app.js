@@ -1,11 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const expressHbs = require('express-handlebars');
 
 const app = express();
 
-app.set('view engine', 'pug'); //set global configuration items
-app.set('views', 'views'); //compiles dynamic templates and where to find these templates(2nd parameter is folder name)
+//whatever you write in 'hbs' has to be written as 2nd arguement of set method. also files extension has to be that too
+app.engine('hbs',expressHbs({layoutsDir: 'views/layouts/', defaultLayout: 'main-layout', extname: 'hbs'}));
+app.set('view engine', 'hbs');
+app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -17,8 +20,7 @@ app.use('/admin', adminRoutes.router);
 app.use(shopRoutes);
 
 app.use((req, res, next) => {
-    //res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
-    res.status(404).render('404');
+    res.status(404).render('404', {pageTitle: 'Page Not Found'});
 });
 
 app.listen(3000);
