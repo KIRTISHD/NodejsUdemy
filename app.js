@@ -1,21 +1,21 @@
 const http = require('http');
 const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
-app.use('/add-product', (req, res, next) => {
-    console.log("In second middleware")
-    res.send('<form action="/product" method="POST"><input type="text" name="title"><button type="submit">Add Product</button></form>'); // default header is text/html
-});
+app.use(bodyParser.urlencoded());
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('product', (req, res, next) => {
-    console.log(req.body);
-    res.redirect('/');
-});
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
-app.use('/', (req, res, next) => {
-    console.log("In second middleware")
-    res.send('<h1>  Inside Express </h1>'); // default header is text/html
+app.use((req, res, next) => {
+    //res.status(404).send('<h1> Page not found </h1>');
+    res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
 app.listen(3000);
