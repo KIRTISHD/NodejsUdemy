@@ -1,18 +1,24 @@
 const http = require('http');
+const express = require('express');
 
-const routes = require('./routes');
-//One way of creating listener function is creating an actual function
-//  to listen to the request.
-// function rqListener(req, res) {
+const app = express();
 
-// }
-// http.createServer(rqListener);
+app.use('/add-product', (req, res, next) => {
+    console.log("In second middleware")
+    res.send('<form action="/product" method="POST"><input type="text" name="title"><button type="submit">Add Product</button></form>'); // default header is text/html
+});
 
-//Second way is to create an anonymous function inside the createServer function
-// it's event driven architecture
-//const server = http.createServer(routes);
+app.use('product', (req, res, next) => {
+    console.log(req.body);
+    res.redirect('/');
+});
 
-const server = http.createServer(routes.handler);
+app.use('/', (req, res, next) => {
+    console.log("In second middleware")
+    res.send('<h1>  Inside Express </h1>'); // default header is text/html
+});
 
-// default => 8080 - port, localhost - hostname
-server.listen(7070);
+app.listen(3000);
+// alternative for above code
+//const server = http.createServer(app);
+//server.listen(3000);
