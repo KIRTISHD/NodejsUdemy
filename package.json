@@ -1,0 +1,24 @@
+{
+  "name": "nodejs-udemy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "start-server": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KIRTISHD/NodejsUdemy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KIRTISHD/NodejsUdemy/issues"
+  },
+  "homepage": "https://github.com/KIRTISHD/NodejsUdemy#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
