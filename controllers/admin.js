@@ -1,6 +1,7 @@
 const Product = require('../models/product');
 
 exports.getAddProduct = (req, res, next) => {
+    console.log(req);
     res.render('admin/edit-product', {
         pageTitle: 'Add Product',
         path: '/admin/add-product',
@@ -36,34 +37,33 @@ exports.postEditProduct = (req, res, next) => {
     const updatedImageUrl = req.body.imageUrl;
     const updatedDesc = req.body.description;
 
-    const product = new Product(
-        prodId,
-        updatedTitle,
-        updatedPrice,
-        updatedDesc,
-        updatedImageUrl
-    );
-    product
-        .save()
-        .then(result => {
-            console.log('UPDATED PRODUCT!');
-            res.redirect('/admin/products');
-        }).catch(err => console.log(err));
+    Product.findById(prodId).then(product => {
+        product.title = updatedTitle;
+        product.price = updatedPrice;
+        product.description = updatedDesc;
+        product.imageUrl = updatedImageUrl;
+        return product.save()
+    })
+    .then(result => {
+        console.log('UPDATED PRODUCT!');
+        res.redirect('/admin/products');
+    }).catch(err => console.log(err));
 };
 
 exports.postAddProduct = (req, res, next) => {
+    console.log(req);
     const title = req.body.title;
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
-    const product = new Product(
-        null,
-        title,
-        price,
-        description,
-        imageUrl,
-        req.user._id
-    );
+    const product = new Product({
+        title: title,
+        imageUrl: imageUrl,
+        price: price,
+        description: description,
+        //mongoose will automatically get id from user
+        userId: req.user
+    });
     product.save()
         .then(result => {
             console.log('Created a product');
@@ -75,7 +75,7 @@ exports.postAddProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.deleteById(prodId)
+    Product.findByIdAndRemove(prodId)
         .then(() => {
             console.log('DESTROYED PRODUCT');
             res.redirect('/admin/products');
@@ -84,7 +84,12 @@ exports.postDeleteProduct = (req, res, next) => {
 
 
 exports.getProducts = (req, res, next) => {
-    req.fetctAll()
+    //this will give all products one by one
+    //Product.find().cursor().eachAsync
+    Product.find()
+    //get particular columns only with space
+    //.select('a b c')
+    //.populate('userId')
         .then(products => {
             res.render('admin/products', {
                 pageTitle: 'List Of Products',
