@@ -2,6 +2,9 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sgMail = require('@sendgrid/mail');
+
+const { validationResult } = require('express-validator/check');
+
 //const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 const User = require('../models/user');
@@ -33,6 +36,16 @@ exports.getLogin = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    //422 - validation failed error code
+    return res.status(422).render('auth/login', {
+      path: '/login',
+      pageTitle: 'Login',
+      errorMessage: errors.array[0].msg
+    });
+  }
   User.findOne({ email: email })
     .then(user => {
       if (!user) {
@@ -78,42 +91,48 @@ exports.getSignup = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
-  User.findOne({ email: email })
-    .then(userDoc => {
-      if (userDoc) {
-        req.flash('error', 'Email already Exists');
-        return res.redirect('/signup');
-      }
-      return bcrypt.hash(password, 12).
-        then(hashedPassword => {
-          const user = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] }
-          });
-          return user.save();
-        }).then(result => {
-          const msg = {
-            to: 'test@example.com',
-            from: 'test@example.com',
-            subject: 'Sending with Twilio SendGrid is Fun',
-            text: 'and easy to do anywhere, even with Node.js',
-            html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-          };
-          return sgMail.send(msg);
 
-          /*return transporter.sendMail({
-            to: email,
-            from: 'aniket.dhande@gmail.com',
-            subject: ' Signup Completed for my Node Shop',
-            html: '<h1> Congrats!! You have won ₹1000000 </h1>'
-          });*/
-        }).then(result => {
-          res.redirect('/');
-        })
-        .catch(err => console.log(err));
-    }).catch(err => console.log(err));
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    //422 - validation failed error code
+    return res.status(422).render(
+      'auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      errorMessage: errors.array()[0].msg
+    });
+  }
+
+  bcrypt.hash(password, 12).
+    then(hashedPassword => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] }
+      });
+      return user.save();
+    })
+    /*.then(result => {
+      /*const msg = {
+        to: 'test@example.com',
+        from: 'test@example.com',
+        subject: 'Sending with Twilio SendGrid is Fun',
+        text: 'and easy to do anywhere, even with Node.js',
+        html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+      };
+      return sgMail.send(msg);*/
+
+      /*return transporter.sendMail({
+        to: email,
+        from: 'aniket.dhande@gmail.com',
+        subject: ' Signup Completed for my Node Shop',
+        html: '<h1> Congrats!! You have won ₹1000000 </h1>'
+      });
+    })*/
+    .then(result => {
+      res.redirect('/login');
+    })
+    .catch(err => console.log(err));
 };
 
 exports.getReset = (req, res, next) => {
@@ -137,7 +156,7 @@ exports.postReset = (req, res, next) => {
       return res.redirect('/reset');
     }
     const token = buffer.toString('hex');
-    User.findOne({ email: req.user.email}).then(user =>{
+    User.findOne({ email: req.user.email }).then(user => {
       if (!user) {
         req.flash('error', 'No account with that email found');
         return res.redirect('/reset');
@@ -146,7 +165,7 @@ exports.postReset = (req, res, next) => {
       // 1 hour
       user.resetTokenExpiration = Date.now() + 3600000;
       return user.save();
-    }).then(result=> {
+    }).then(result => {
       res.redirect('/');
       /*return transporter.sendMail({
             to: email,
@@ -157,7 +176,7 @@ exports.postReset = (req, res, next) => {
               <p> Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password </p>
             `
           });*/
-    }).catch(err=> console.log(err));
+    }).catch(err => console.log(err));
   });
 };
 
