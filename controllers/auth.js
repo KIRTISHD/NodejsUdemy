@@ -1,6 +1,18 @@
 const bcrypt = require('bcryptjs');
+const nodemailer  = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
+//const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 const User = require('../models/user');
+
+//sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+/* transporter = nodemailer.createTransport(sendgridTransport({
+  auth: {
+    api_key: process.env.SENDGRIDKEY
+  }
+}));*/
+
+
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
@@ -81,7 +93,24 @@ exports.postSignup = (req, res, next) => {
           });
           return user.save();
         }).then(result => {
+          const msg = {
+            to: 'test@example.com',
+            from: 'test@example.com',
+            subject: 'Sending with Twilio SendGrid is Fun',
+            text: 'and easy to do anywhere, even with Node.js',
+            html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+          };
+          return sgMail.send(msg);
+          
+          /*return transporter.sendMail({
+            to: email,
+            from: 'aniket.dhande@gmail.com',
+            subject: ' Signup Completed for my Node Shop',
+            html: '<h1> Congrats!! You have won ₹1000000 </h1>'
+          });*/
+        }).then(result => {
           res.redirect('/');
-        });
+        })
+        .catch(err => console.log(err));
     }).catch(err => console.log(err));
 };
