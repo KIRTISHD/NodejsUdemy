@@ -1,46 +1,25 @@
 {
   "name": "nodejs-udemy",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "REST APIS",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
-    "start-server": "node app.js"
+    "start": "nodemon app.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/KIRTISHD/NodejsUdemy.git"
   },
-  "author": "",
+  "author": "KD",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/KIRTISHD/NodejsUdemy/issues"
   },
   "homepage": "https://github.com/KIRTISHD/NodejsUdemy#readme",
-  "devDependencies": {
-    "nodemon": "^2.0.4"
-  },
   "dependencies": {
-    "@sendgrid/mail": "^7.1.1",
-    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
-    "connect-flash": "^0.1.1",
-    "connect-mongodb-session": "^2.3.2",
-    "csurf": "^1.11.0",
-    "ejs": "^3.1.3",
     "express": "^4.17.1",
-    "express-handlebars": "^3.0.2",
-    "express-session": "^1.17.1",
-    "express-validator": "^6.5.0",
-    "mongodb": "^3.5.8",
-    "mongoose": "^5.9.17",
-    "multer": "^1.4.2",
-    "mysql2": "^2.1.0",
-    "nodemailer": "^6.4.8",
-    "nodemailer-sendgrid-transport": "^0.2.0",
-    "pdfkit": "^0.11.0",
-    "pug": "^3.0.0",
-    "sequelize": "^5.21.11"
+    "nodemon": "^2.0.4"
   }
 }
