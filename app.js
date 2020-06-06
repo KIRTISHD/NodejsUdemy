@@ -3,11 +3,10 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
-//import { default as connectMongoDBSession } from 'connect-mongodb-session';
 const MongoDBStore = require('connect-mongodb-session')(session);
-//const MongoDBStore = connectMongoDBSession(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 const MONGODB_URI = 'mongodb+srv://kirtish:6BBUJ0hio0sRDVEu@cluster0-jtebh.mongodb.net/shop?retryWrites=true&w=majority';
 
@@ -21,6 +20,24 @@ const store = new MongoDBStore({
 });
 const csrfProtection = csrf();
 
+const fileStorage = multer.diskStorage( {
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().getTime() + '-' + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' ||file.mimetype === 'image/jpeg') {
+    cb(null, true);
+  }
+  else{
+    cb(null, false);
+  }
+};
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -29,7 +46,12 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+//image in single refers to name of input tag used in edit-product
+app.use(multer({ storage:fileStorage, fileFilter: fileFilter }).single('image'));
+
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(session({ secret: 'secret code', resave: false, saveUninitialized: false, store: store }));
 
 app.use(csrfProtection);
@@ -67,7 +89,7 @@ app.use('/500', errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
-  //res.redirect('/500');
+  //console.log("Idhar kaise aaya re baba", req.session);
   res.status(500).render('500', {
     pageTitle: 'Error!!',
     path: '/500',

@@ -1,22 +1,9 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
-const sgMail = require('@sendgrid/mail');
 
 const { validationResult } = require('express-validator/check');
 
-//const sendgridTransport = require('nodemailer-sendgrid-transport');
-
 const User = require('../models/user');
-
-//sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-/* transporter = nodemailer.createTransport(sendgridTransport({
-  auth: {
-    api_key: process.env.SENDGRIDKEY
-  }
-}));*/
-
-
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
@@ -59,8 +46,6 @@ exports.postLogin = (req, res, next) => {
   User.findOne({ email: email })
     .then(user => {
       if (!user) {
-        //req.flash('error', 'Invalid Email or password');
-        //return res.redirect('/login');
         return res.status(422).render('auth/login', {
           path: '/login',
           pageTitle: 'Login',
@@ -78,8 +63,6 @@ exports.postLogin = (req, res, next) => {
           req.session.isLoggedIn = true;
           return req.session.save(() => { res.redirect('/') });
         }
-        //req.flash('error', 'Invalid Email or password');
-        //res.redirect('/login');
         return res.status(422).render('auth/login', {
           path: '/login',
           pageTitle: 'Login',
@@ -158,23 +141,6 @@ exports.postSignup = (req, res, next) => {
       });
       return user.save();
     })
-    /*.then(result => {
-      /*const msg = {
-        to: 'test@example.com',
-        from: 'test@example.com',
-        subject: 'Sending with Twilio SendGrid is Fun',
-        text: 'and easy to do anywhere, even with Node.js',
-        html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-      };
-      return sgMail.send(msg);*/
-
-      /*return transporter.sendMail({
-        to: email,
-        from: 'aniket.dhande@gmail.com',
-        subject: ' Signup Completed for my Node Shop',
-        html: '<h1> Congrats!! You have won ₹1000000 </h1>'
-      });
-    })*/
     .then(result => {
       res.redirect('/login');
     })
@@ -217,15 +183,6 @@ exports.postReset = (req, res, next) => {
       return user.save();
     }).then(result => {
       res.redirect('/');
-      /*return transporter.sendMail({
-            to: email,
-            from: 'aniket.dhande@gmail.com',
-            subject: ' Password Reset',
-            html: `
-              <p> You requested a password reset </p>
-              <p> Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password </p>
-            `
-          });*/
     })
     .catch(err => {
         const error = new Error(err);
