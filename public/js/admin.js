@@ -11,11 +11,13 @@ const deleteProduct = btn => {
       }
     })
       .then(result => {
+          console.log("mai idhar hu");
         return result.json();
       })
       .then(data => {
         console.log(data);
         productElement.parentNode.removeChild(productElement);
+
       })
       .catch(err => {
         console.log(err);

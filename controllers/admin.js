@@ -127,8 +127,7 @@ exports.postAddProduct = (req, res, next) => {
             product: {
                 title: title,
                 price: price,
-                description: description,
-                imageUrl: imageUrl
+                description: description
             },
             hasError: true,
             errorMessage: errors.array()[0].msg,
@@ -163,11 +162,13 @@ exports.deleteProduct = (req, res, next) => {
     const prodId = req.params.productId;
     Product.findById(prodId)
         .then(product => {
+            
+          console.log("mai idhar bhi hu", product);
             if (!product) {
                 return next(new Error('Product Not Found'));
             }
             fileHelper.deleteFile(product.imageUrl);
-            Product.deleteOne({ _id: prodId, usedId: req.user._id })
+            return Product.deleteOne({ _id: prodId, userId: req.user._id })
         })
     
         .then(() => {
